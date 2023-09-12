@@ -44,17 +44,16 @@ func CallLichessAPI(speeds string, ratings string, uci string) (*ChessData, erro
 		client := &http.Client{}
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
-			return nil, fmt.Errorf("failed to generate request: %v", err)
+			log.Printf("failed to generate request: %v", err)
+			time.Sleep(1 * time.Minute)
+			continue
 		}
 
 		res, err := client.Do(req)
 		if err != nil {
-			if res != nil && res.StatusCode == 429 {
-				fmt.Println("429 Too Many Requests")
-				time.Sleep(1 * time.Minute)
-				continue
-			}
-			return nil, fmt.Errorf("failed to communicate with API: %v", err)
+			log.Printf("failed to communicate with API: %v", err)
+			time.Sleep(1 * time.Minute)
+			continue
 		}
 
 		// Because even when a 429 error occurs, 'err' remains nil.
@@ -67,13 +66,15 @@ func CallLichessAPI(speeds string, ratings string, uci string) (*ChessData, erro
 		defer res.Body.Close()
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read body: %v", err)
+			log.Printf("failed to read body: %v", err)
+			time.Sleep(1 * time.Minute)
+			continue
 		}
 
 		return parseChessData(body)
 	}
-	return nil, fmt.Errorf(
-		"exceeded the maximum number of API call attempts.")
+	return nil,
+		fmt.Errorf("exceeded the maximum number of API call attempts.")
 }
 
 func parseChessData(data []byte) (*ChessData, error) {

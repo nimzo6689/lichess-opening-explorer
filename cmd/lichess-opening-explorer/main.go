@@ -9,14 +9,14 @@ import (
 
 func main() {
 	const speeds = "blitz"
-	const ratings = "1600"
+	const ratings = "1200"
 	uci := ""
 
 	chessData, err := internal.CallLichessAPI(speeds, ratings, uci)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = internal.RegisterStatistics(speeds, ratings, chessData)
+	err = internal.RegisterEvents(speeds, ratings, chessData)
 	if err != nil {
 		log.Fatal(err)
 	}
